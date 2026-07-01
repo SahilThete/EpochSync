@@ -1,0 +1,47 @@
+# Build artifacts
+bin/
+obj/
+build/
+out/
+dist/
+
+# Compiled binaries and libraries
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.obj
+*.o
+*.a
+*.so
+*.dylib
+
+# Temporary and log files
+*.log
+*.tmp
+*.temp
+*.cache
+*.bak
+*.swp
+*.swo
+
+# IDE and editor files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.ncb
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+*.vcxproj.user
+*.csproj.user
+*.iml
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
