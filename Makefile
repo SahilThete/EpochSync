@@ -153,12 +153,13 @@ $(EE_BIN).elf: $(EE_OBJS)
 	$(EE_LDFLAGS) \
 	$(EE_LIBS) \
 	-o $@
-     @echo
-     @echo "========================================"
-     @echo "EpochSync Build Complete"
-     @echo "========================================"
-     @$(EE_SIZE) $(EE_BIN).elf
-    @echo
+
+	@echo
+	@echo "========================================"
+	@echo "EpochSync Build Complete"
+	@echo "========================================"
+	@$(EE_SIZE) $(EE_BIN).elf
+	@echo
 
 #------------------------------------------------------------------------------
 # Compile C
@@ -221,7 +222,7 @@ sections:
 	$(EE_READELF) -S $(EE_BIN).elf
 
 symbols:
-    $(EE_READELF) -s $(EE_BIN).elf
+	$(EE_READELF) -s $(EE_BIN).elf
 
 disasm:
 	$(EE_OBJDUMP) -d $(EE_BIN).elf
