@@ -9,7 +9,7 @@
 # Project
 #------------------------------------------------------------------------------
 
-EE_BIN      = EpochSync
+EE_BIN		:= EpochSync
 
 #------------------------------------------------------------------------------
 # Environment Checks
@@ -27,30 +27,30 @@ endif
 # Toolchain
 #------------------------------------------------------------------------------
 
-CROSS        := mips64r5900el-ps2-elf
-EE_CC        := $(CROSS)-gcc
-EE_CXX       := $(CROSS)-g++
-EE_AS        := $(CROSS)-as
-EE_SIZE      := $(CROSS)-size
-EE_STRIP     := $(CROSS)-strip
-EE_OBJDUMP   := $(CROSS)-objdump
-EE_READELF   := $(CROSS)-readelf
+CROSS		:= mips64r5900el-ps2-elf
+EE_CC		:= $(CROSS)-gcc
+EE_CXX		:= $(CROSS)-g++
+EE_AS		:= $(CROSS)-as
+EE_SIZE		:= $(CROSS)-size
+EE_STRIP	:= $(CROSS)-strip
+EE_OBJDUMP	:= $(CROSS)-objdump
+EE_READELF	:= $(CROSS)-readelf
 
 #------------------------------------------------------------------------------
 # Source Directories
 #------------------------------------------------------------------------------
 
 SRC_DIRS := \
-    src \
-    src/core \
-    src/common \
-    src/config \
-    src/launcher \
-    src/network \
-    src/ntp \
-    src/rtc \
-    src/system \
-    src/ui
+	src \
+	src/core \
+	src/common \
+	src/config \
+	src/launcher \
+	src/network \
+	src/ntp \
+	src/rtc \
+	src/system \
+	src/ui
 
 #------------------------------------------------------------------------------
 # Source Files
@@ -69,29 +69,29 @@ EE_DEPENDS := $(EE_OBJS:.o=.d)
 #------------------------------------------------------------------------------
 
 EE_INCS := \
-    -I. \
-    -Isrc \
-    -Isrc/core \
-    -Isrc/common \
-    -Isrc/config \
-    -Isrc/launcher \
-    -Isrc/network \
-    -Isrc/ntp \
-    -Isrc/rtc \
-    -Isrc/system \
-    -Isrc/ui \
-    -I$(PS2SDK)/common/include \
-    -I$(PS2SDK)/ee/include \
-    -I$(PS2DEV)/gsKit/include
+	-I. \
+	-Isrc \
+	-Isrc/core \
+	-Isrc/common \
+	-Isrc/config \
+	-Isrc/launcher \
+	-Isrc/network \
+	-Isrc/ntp \
+	-Isrc/rtc \
+	-Isrc/system \
+	-Isrc/ui \
+	-I$(PS2SDK)/common/include \
+	-I$(PS2SDK)/ee/include \
+	-I$(PS2DEV)/gsKit/include
 
 #------------------------------------------------------------------------------
 # Libraries
 #------------------------------------------------------------------------------
 
 EE_LIBS := \
-    -lkernel \
-    -lc \
-    -lpatches
+	-lkernel \
+	-lc \
+	-lpatches
 
 #------------------------------------------------------------------------------
 # Compiler Flags
@@ -100,20 +100,20 @@ EE_LIBS := \
 DEBUG ?= 0
 
 EE_CFLAGS := \
-    -D_EE \
-    -G0 \
-    -Wall \
-    -Wextra \
-    -Wshadow \
-    -Wpointer-arith \
-    -Wmissing-prototypes \
-    -Wstrict-prototypes \
-    -Wundef \
-    -Werror=implicit-function-declaration \
-    -ffunction-sections \
-    -fdata-sections \
-    -MMD \
-    -MP
+	-D_EE \
+	-G0 \
+	-Wall \
+	-Wextra \
+	-Wshadow \
+	-Wpointer-arith \
+	-Wmissing-prototypes \
+	-Wstrict-prototypes \
+	-Wundef \
+	-Werror=implicit-function-declaration \
+	-ffunction-sections \
+	-fdata-sections \
+	-MMD \
+	-MP
 
 ifeq ($(DEBUG),1)
 
@@ -132,9 +132,9 @@ EE_CXXFLAGS := $(EE_CFLAGS)
 #------------------------------------------------------------------------------
 
 EE_LDFLAGS := \
-    -Wl,--gc-sections \
-    -Wl,-Map,$(EE_BIN).map \
-    -L$(PS2SDK)/ee/lib
+	-Wl,--gc-sections \
+	-Wl,-Map,$(EE_BIN).map \
+	-L$(PS2SDK)/ee/lib
 
 #------------------------------------------------------------------------------
 # Default Target
