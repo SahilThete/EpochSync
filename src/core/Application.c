@@ -7,8 +7,15 @@
 
 #include "../system/System.h"
 
+#include "../common/Logger.h"
+#include "../common/Modules.h"
+
 EpochSyncResult Application_Initialize(void)
 {
+    Logger_Info(
+        MODULE_APPLICATION,
+        "Initializing application.");
+
     EpochSyncResult Result;
 
     Result = System_Initialize();
@@ -34,5 +41,9 @@ void Application_Run(void)
 
 void Application_Shutdown(void)
 {
+    Logger_Info(
+        MODULE_APPLICATION,
+        "Shutting down application.");
+
     System_Shutdown();
 }

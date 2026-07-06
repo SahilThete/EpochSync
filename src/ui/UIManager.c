@@ -10,10 +10,17 @@
 
 #include "UIManager.h"
 
+#include "../common/Logger.h"
+#include "../common/Modules.h"
+
 static UIScreen g_CurrentScreen = UI_SCREEN_SPLASH;
 
 EpochSyncResult UIManager_Initialize(void)
 {
+    Logger_Info(
+        MODULE_UI,
+        "Initializing UI manager.");
+
     g_CurrentScreen = UI_SCREEN_SPLASH;
 
     return EPOCHSYNC_SUCCESS;
@@ -21,11 +28,18 @@ EpochSyncResult UIManager_Initialize(void)
 
 void UIManager_Shutdown(void)
 {
+    Logger_Info(
+        MODULE_UI,
+        "Shutting down UI manager.");
 }
 
 EpochSyncResult UIManager_SetScreen(UIScreen screen)
 {
     g_CurrentScreen = screen;
+
+    Logger_Info(
+        MODULE_UI,
+        "UI screen set.");
 
     return EPOCHSYNC_SUCCESS;
 }

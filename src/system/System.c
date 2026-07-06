@@ -20,15 +20,32 @@
 #include <iopcontrol.h>
 #include <sbv_patches.h>
 
+#include "../common/Logger.h"
+#include "../common/Modules.h"
+
 EpochSyncResult System_Initialize(void)
 {
+    Logger_Info(
+        MODULE_SYSTEM,
+        "Initializing system.");
     /* ---------- Initialize SIF ---------- */
+
+    /* ---------- Initialize SIF ---------- */
+
+    Logger_Info(
+        MODULE_SYSTEM,
+        "Initializing SIF.");
 
     SifInitRpc(0);
     SifLoadFileInit();
     SifInitIopHeap();
 
+
     /* ---------- Reset IOP ---------- */
+
+    Logger_Info(
+        MODULE_SYSTEM,
+        "Resetting IOP.");
 
     while (!SifIopReset("", 0))
     {
@@ -44,7 +61,12 @@ EpochSyncResult System_Initialize(void)
     SifLoadFileInit();
     SifInitIopHeap();
 
+
     /* ---------- Apply SBV patches ---------- */
+
+    Logger_Info(
+        MODULE_SYSTEM,
+        "Applying SBV patches.");
 
     sbv_patch_enable_lmb();
     sbv_patch_disable_prefix_check();
@@ -54,11 +76,19 @@ EpochSyncResult System_Initialize(void)
      * Load embedded IRX modules.
      */
 
+    Logger_Info(
+        MODULE_SYSTEM,
+        "System initialization complete.");
+
     return EPOCHSYNC_SUCCESS;
 }
 
 void System_Shutdown(void)
 {
+    Logger_Info(
+        MODULE_SYSTEM,
+        "Shutting down system.");
+
     /*
      * Reserved.
      *
