@@ -1,45 +1,196 @@
-# Makefile for EpochSync NTP client for PS2
-# Uses absolute PS2SDK toolchain paths and builds nested source directories.
+###############################################################################
+# EpochSync
+# Makefile
+#
+# PS2SDK Build System
+###############################################################################
 
-TARGET := EpochSync
-SRCDIR := src
-BUILDDIR := build
-BINDIR := bin
+#------------------------------------------------------------------------------
+# Project
+#------------------------------------------------------------------------------
 
-PS2DEV ?= $(PS2DEV)
-EE_BIN = $(PS2DEV)/ee/bin
-CC := $(EE_BIN)/mips64r5900el-ps2-elf-gcc.exe
-LD := $(CC)
-OBJCOPY := $(EE_BIN)/mips64r5900el-ps2-elf-objcopy.exe
-CFLAGS := -O2 -G0 -Wall -fno-builtin -mno-abicalls -ffreestanding -I$(SRCDIR)
-LDFLAGS := -Tlinkfile.ld -nostdlib
+EE_BIN      = EpochSync
 
-SRCS := main.c $(wildcard $(SRCDIR)/*/*.c)
-OBJS := $(patsubst %.c,$(BUILDDIR)/%.o,$(SRCS))
+#------------------------------------------------------------------------------
+# Environment Checks
+#------------------------------------------------------------------------------
 
-ELF := $(BINDIR)/$(TARGET).elf
-BIN := $(BINDIR)/$(TARGET).bin
+ifndef PS2DEV
+$(error PS2DEV environment variable is not defined)
+endif
 
-.PHONY: all clean dirs install
+ifndef PS2SDK
+$(error PS2SDK environment variable is not defined)
+endif
 
-all: dirs $(BIN)
+#------------------------------------------------------------------------------
+# Toolchain
+#------------------------------------------------------------------------------
 
-dirs:
-	@mkdir -p $(sort $(dir $(OBJS))) $(BINDIR)
+CROSS      := mips64r5900el-ps2-elf
+EE_CC      := $(CROSS)-gcc
+EE_CXX     := $(CROSS)-g++
+EE_AS      := $(CROSS)-as
 
-$(BUILDDIR)/%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+#------------------------------------------------------------------------------
+# Source Directories
+#------------------------------------------------------------------------------
 
-$(ELF): $(OBJS)
-	$(LD) $(LDFLAGS) $^ -o $@
+SRC_DIRS := \
+    src \
+    src/core \
+    src/common \
+    src/config \
+    src/launcher \
+    src/network \
+    src/ntp \
+    src/rtc \
+    src/system \
+    src/ui
 
-$(BIN): $(ELF)
-	$(OBJCOPY) -O binary $< $@
+#------------------------------------------------------------------------------
+# Source Files
+#------------------------------------------------------------------------------
+
+EE_SRCS :=
+
+EE_SRCS += $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c))
+
+EE_OBJS := $(EE_SRCS:.c=.o)
+
+EE_DEPENDS := $(EE_OBJS:.o=.d)
+
+#------------------------------------------------------------------------------
+# Include Directories
+#------------------------------------------------------------------------------
+
+EE_INCS := \
+    -I. \
+    -Isrc \
+    -Isrc/core \
+    -Isrc/common \
+    -Isrc/config \
+    -Isrc/launcher \
+    -Isrc/network \
+    -Isrc/ntp \
+    -Isrc/rtc \
+    -Isrc/system \
+    -Isrc/ui \
+    -I$(PS2SDK)/common/include \
+    -I$(PS2SDK)/ee/include \
+    -I$(PS2DEV)/gsKit/include
+
+#------------------------------------------------------------------------------
+# Libraries
+#------------------------------------------------------------------------------
+
+EE_LIBS := \
+    -lkernel \
+    -lc \
+    -lpatches
+
+#------------------------------------------------------------------------------
+# Compiler Flags
+#------------------------------------------------------------------------------
+
+DEBUG ?= 0
+
+EE_CFLAGS := \
+    -D_EE \
+    -G0 \
+    -Wall \
+    -Wextra \
+    -Wshadow \
+    -Wpointer-arith \
+    -Wmissing-prototypes \
+    -Wstrict-prototypes \
+    -Wundef \
+    -Werror=implicit-function-declaration \
+    -ffunction-sections \
+    -fdata-sections \
+    -MMD \
+    -MP
+
+ifeq ($(DEBUG),1)
+
+EE_CFLAGS += -O0 -g -DDEBUG
+
+else
+
+EE_CFLAGS += -O2
+
+endif
+
+EE_CXXFLAGS := $(EE_CFLAGS)
+
+#------------------------------------------------------------------------------
+# Linker Flags
+#------------------------------------------------------------------------------
+
+EE_LDFLAGS := \
+    -Wl,--gc-sections \
+    -L$(PS2SDK)/ee/lib
+
+#------------------------------------------------------------------------------
+# Default Target
+#------------------------------------------------------------------------------
+
+all: $(EE_BIN).elf
+
+#------------------------------------------------------------------------------
+# Linking
+#------------------------------------------------------------------------------
+
+$(EE_BIN).elf: $(EE_OBJS)
+
+	$(EE_CC) \
+	$(EE_OBJS) \
+	$(EE_LDFLAGS) \
+	$(EE_LIBS) \
+	-o $@
+
+#------------------------------------------------------------------------------
+# Compile C
+#------------------------------------------------------------------------------
+
+%.o: %.c
+
+	$(EE_CC) \
+	$(EE_CFLAGS) \
+	$(EE_INCS) \
+	-c $< \
+	-o $@
+
+#------------------------------------------------------------------------------
+# Dependency Files
+#------------------------------------------------------------------------------
+
+-include $(EE_DEPENDS)
+
+#------------------------------------------------------------------------------
+# Utilities
+#------------------------------------------------------------------------------
 
 clean:
-	-rm -f $(OBJS) $(ELF) $(BIN)
 
-install: all
-	@echo "Build complete. Copy $(BIN) to your PS2 or package as needed."
+	rm -f $(EE_OBJS)
+	rm -f $(EE_DEPENDS)
+	rm -f $(EE_BIN).elf
 
+rebuild: clean all
+
+debug:
+
+	$(MAKE) DEBUG=1
+
+release:
+
+	$(MAKE) DEBUG=0
+
+run:
+
+	@echo "Copy EpochSync.elf to your PS2 device."
+
+#------------------------------------------------------------------------------
 # EOF
+#------------------------------------------------------------------------------
