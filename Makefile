@@ -27,10 +27,14 @@ endif
 # Toolchain
 #------------------------------------------------------------------------------
 
-CROSS      := mips64r5900el-ps2-elf
-EE_CC      := $(CROSS)-gcc
-EE_CXX     := $(CROSS)-g++
-EE_AS      := $(CROSS)-as
+CROSS        := mips64r5900el-ps2-elf
+EE_CC        := $(CROSS)-gcc
+EE_CXX       := $(CROSS)-g++
+EE_AS        := $(CROSS)-as
+EE_SIZE      := $(CROSS)-size
+EE_STRIP     := $(CROSS)-strip
+EE_OBJDUMP   := $(CROSS)-objdump
+EE_READELF   := $(CROSS)-readelf
 
 #------------------------------------------------------------------------------
 # Source Directories
@@ -129,6 +133,7 @@ EE_CXXFLAGS := $(EE_CFLAGS)
 
 EE_LDFLAGS := \
     -Wl,--gc-sections \
+    -Wl,-Map,$(EE_BIN).map \
     -L$(PS2SDK)/ee/lib
 
 #------------------------------------------------------------------------------
@@ -148,6 +153,12 @@ $(EE_BIN).elf: $(EE_OBJS)
 	$(EE_LDFLAGS) \
 	$(EE_LIBS) \
 	-o $@
+     @echo
+     @echo "========================================"
+     @echo "EpochSync Build Complete"
+     @echo "========================================"
+     @$(EE_SIZE) $(EE_BIN).elf
+    @echo
 
 #------------------------------------------------------------------------------
 # Compile C
@@ -176,6 +187,12 @@ clean:
 	rm -f $(EE_OBJS)
 	rm -f $(EE_DEPENDS)
 	rm -f $(EE_BIN).elf
+	rm -f $(EE_BIN).map
+	rm -f $(EE_BIN).disasm
+	rm -f $(EE_BIN).sym
+	rm -f $(EE_BIN).lst
+
+	@echo "Build artifacts removed."
 
 rebuild: clean all
 
@@ -185,7 +202,29 @@ debug:
 
 release:
 
+	$(MAKE) clean
+
 	$(MAKE) DEBUG=0
+
+	$(EE_STRIP) $(EE_BIN).elf
+
+	@echo
+	@echo "Release build generated."
+
+size:
+	$(EE_SIZE) $(EE_BIN).elf
+
+info:
+	$(EE_READELF) -h $(EE_BIN).elf
+
+sections:
+	$(EE_READELF) -S $(EE_BIN).elf
+
+symbols:
+    $(EE_READELF) -s $(EE_BIN).elf
+
+disasm:
+	$(EE_OBJDUMP) -d $(EE_BIN).elf
 
 run:
 
