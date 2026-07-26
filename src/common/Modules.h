@@ -17,6 +17,8 @@
 
 #define MODULE_UI               "UI"
 
+#define MODULE_TIMEMANAGER      "TimeManager"
+
 // #define MODULE_LOGGER           "Logger"
 
 #endif /* EPOCHSYNC_MODULES_H */
