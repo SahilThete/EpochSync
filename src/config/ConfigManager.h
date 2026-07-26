@@ -10,7 +10,7 @@
     Configuration Structure
 ----------------------------------------------------------*/
 
-typedef struct
+typedef struct EpochSyncConfig
 {
     bool AutoSync;
 
@@ -45,6 +45,8 @@ EpochSyncResult ConfigManager_Save(void);
 ----------------------------------------------------------*/
 
 bool ConfigManager_IsLoaded(void);
+
+bool ConfigManager_IsInitialized(void);
 
 const EpochSyncConfig* ConfigManager_GetConfiguration(void);
 
