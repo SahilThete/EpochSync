@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
         MODULE_APPLICATION,
         "Starting EpochSync.");
 
-    if (!Application_Initialize())
+    if (Application_Initialize() != EPOCHSYNC_SUCCESS)
         return -1;
 
     Logger_Info(
