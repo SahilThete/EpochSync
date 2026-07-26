@@ -2,26 +2,8 @@
 #define EPOCHSYNC_RTC_MANAGER_H
 
 #include "../common/Types.h"
+#include "../time/TimeManager.h"
 
-/*----------------------------------------------------------
-    RTC Date/Time Structure
-----------------------------------------------------------*/
-
-typedef struct
-{
-    int Year;
-
-    int Month;
-
-    int Day;
-
-    int Hour;
-
-    int Minute;
-
-    int Second;
-
-} EpochSyncDateTime;
 
 /*----------------------------------------------------------
     Lifecycle
@@ -39,8 +21,10 @@ EpochSyncResult RTCManager_Read(EpochSyncDateTime* dateTime);
 
 EpochSyncResult RTCManager_Write(const EpochSyncDateTime* dateTime);
 
-EpochSyncResult RTCManager_SetUnixTime(u32 unixTime);
+EpochSyncResult RTCManager_ReadUnixTime(u32* unixTime);
 
-EpochSyncResult RTCManager_GetUnixTime(u32* unixTime);
+EpochSyncResult RTCManager_WriteUnixTime(u32 unixTime);
+
+EpochSyncResult RTCManager_IsBatteryAvailable(bool* available);
 
 #endif /* EPOCHSYNC_RTC_MANAGER_H */

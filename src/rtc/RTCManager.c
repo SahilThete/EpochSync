@@ -11,11 +11,14 @@
 #include "RTCManager.h"
 
 #include <stddef.h>
+#include <libcdvd.h>
+#include <string.h>
 
 #include "../common/Logger.h"
 #include "../common/Modules.h"
+#include "../time/TimeManager.h"
 
-static u32 g_UnixTime = 0;
+static bool g_Initialized = false;
 
 EpochSyncResult RTCManager_Initialize(void)
 {
@@ -23,7 +26,7 @@ EpochSyncResult RTCManager_Initialize(void)
         MODULE_RTC,
         "Initializing RTC manager.");
 
-    g_UnixTime = 0;
+    g_Initialized = true;
 
     return EPOCHSYNC_SUCCESS;
 }
@@ -33,6 +36,8 @@ void RTCManager_Shutdown(void)
     Logger_Info(
         MODULE_RTC,
         "Shutting down RTC manager.");
+
+    g_Initialized = false;
 }
 
 EpochSyncResult RTCManager_Read(EpochSyncDateTime* dateTime)
@@ -43,17 +48,30 @@ EpochSyncResult RTCManager_Read(EpochSyncDateTime* dateTime)
             MODULE_RTC,
             "RTCManager_Read called with NULL pointer.");
 
+        return EPOCHSYNC_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (!g_Initialized)
+    {
+        Logger_Error(
+            MODULE_RTC,
+            "RTC manager not initialized.");
+
         return EPOCHSYNC_ERROR_UNKNOWN;
     }
 
-    Logger_Info(
+    Logger_Debug(
         MODULE_RTC,
-        "Reading RTC (simulated).");
+        "Reading RTC.");
 
     /*
-     * Phase 2:
-     * Read PS2 RTC
-     */
+    * TODO (Phase 2):
+    * 1. Call sceCdReadClock()
+    * 2. Validate BCD values using TimeManager_IsValidBCD()
+    * 3. Convert BCD -> binary
+    * 4. Populate EpochSyncDateTime
+    * 5. Validate with TimeManager_IsValidDateTime()
+    */
 
     return EPOCHSYNC_SUCCESS;
 }
@@ -69,50 +87,71 @@ EpochSyncResult RTCManager_Write(const EpochSyncDateTime* dateTime)
         return EPOCHSYNC_ERROR_UNKNOWN;
     }
 
-    Logger_Info(
+    Logger_Debug(
         MODULE_RTC,
-        "Writing RTC (simulated).");
+        "Writing RTC.");
 
     /*
-     * Phase 2:
-     * Write PS2 RTC
+     * TODO (Phase 2):
+        * Write PS2 RTC
      */
 
     return EPOCHSYNC_SUCCESS;
 }
 
-EpochSyncResult RTCManager_SetUnixTime(u32 unixTime)
+EpochSyncResult RTCManager_WriteUnixTime(u32 unixTimeUtc)
 {
-    g_UnixTime = unixTime;
+    EpochSyncDateTime rtcDateTime;
 
-    Logger_Info(
+    EpochSyncResult result =
+        TimeManager_UnixToRTCDateTime(
+            unixTimeUtc,
+            &rtcDateTime);
+
+    if (result != EPOCHSYNC_SUCCESS)
+    {
+        return result;
+    }
+
+    Logger_Debug(
         MODULE_RTC,
         "RTC Unix time set.");
 
-    /*
-     * Phase 2:
-     * Convert Unix -> RTC
-     */
+    /* TODO (Phase 2):
+    * Write rtcDateTime using sceCdWriteClock()
+    */
 
     return EPOCHSYNC_SUCCESS;
 }
 
-EpochSyncResult RTCManager_GetUnixTime(u32* unixTime)
+EpochSyncResult RTCManager_ReadUnixTime(u32* unixTime)
 {
     if (unixTime == NULL)
     {
         Logger_Error(
             MODULE_RTC,
-            "RTCManager_GetUnixTime called with NULL pointer.");
+            "RTCManager_ReadUnixTime called with NULL pointer.");
 
-        return EPOCHSYNC_ERROR_UNKNOWN;
+        return EPOCHSYNC_ERROR_INVALID_ARGUMENT;
     }
 
-    Logger_Info(
+    Logger_Debug(
         MODULE_RTC,
-        "RTC GetUnixTime called.");
+        "RTC ReadUnixTime called.");
 
-    *unixTime = g_UnixTime;
+    EpochSyncDateTime rtcDateTime;
+
+    EpochSyncResult result =
+        RTCManager_Read(&rtcDateTime);
+
+    if (result != EPOCHSYNC_SUCCESS)
+    {
+        return result;
+    }
+
+    return TimeManager_RTCDateTimeToUnix(
+        &rtcDateTime,
+        unixTime);
 
     return EPOCHSYNC_SUCCESS;
 }
