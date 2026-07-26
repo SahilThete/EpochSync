@@ -9,7 +9,7 @@
 
 typedef enum
 {
-    UI_SCREEN_SPLASH,
+    UI_SCREEN_SPLASH = 0,
 
     UI_SCREEN_MAIN,
 
@@ -44,6 +44,8 @@ void UIManager_Update(void);
 /*----------------------------------------------------------
     State Queries
 ----------------------------------------------------------*/
+
+bool UIManager_IsInitialized(void);
 
 UIScreen UIManager_GetScreen(void);
 
