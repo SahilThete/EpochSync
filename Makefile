@@ -50,6 +50,7 @@ SRC_DIRS := \
 	src/ntp \
 	src/rtc \
 	src/system \
+	src/time \
 	src/ui
 
 #------------------------------------------------------------------------------
@@ -79,6 +80,7 @@ EE_INCS := \
 	-Isrc/ntp \
 	-Isrc/rtc \
 	-Isrc/system \
+	-Isrc/time \
 	-Isrc/ui \
 	-I$(PS2SDK)/common/include \
 	-I$(PS2SDK)/ee/include \
@@ -91,7 +93,13 @@ EE_INCS := \
 EE_LIBS := \
 	-lkernel \
 	-lc \
-	-lpatches
+	-lpatches \
+	-lps2ip \
+	-lnetman \
+	-lcdvd \
+	-lgskit \
+	-ldmakit \
+	-lpad
 
 #------------------------------------------------------------------------------
 # Compiler Flags
@@ -134,7 +142,8 @@ EE_CXXFLAGS := $(EE_CFLAGS)
 EE_LDFLAGS := \
 	-Wl,--gc-sections \
 	-Wl,-Map,$(EE_BIN).map \
-	-L$(PS2SDK)/ee/lib
+	-L$(PS2SDK)/ee/lib \
+	-L$(PS2DEV)/gsKit/lib
 
 #------------------------------------------------------------------------------
 # Default Target
