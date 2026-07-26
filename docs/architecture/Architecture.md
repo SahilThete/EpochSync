@@ -2,302 +2,169 @@
 
 ## Overview
 
-EpochSync is a modular PlayStation 2 utility designed to synchronize the console's Real-Time Clock (RTC) using the Network Time Protocol (NTP).
+EpochSync is a modular PlayStation 2 homebrew project intended to synchronize the console RTC with network time. The repository currently provides the architectural skeleton and initial module implementations rather than a complete end-to-end RTC sync workflow.
 
-Unlike the original NTPS2 project, EpochSync is designed around independent modules with clearly defined responsibilities, making future maintenance and feature expansion significantly easier.
+The design follows a clear separation of responsibilities so each subsystem can evolve independently.
 
 ---
 
-# High-Level Architecture
+## High-Level Architecture
 
-```
-                 ┌────────────────────┐
-                 │      main.c        │
-                 │ Application Entry  │
-                 └─────────┬──────────┘
-                           │
-                           ▼
-                 ┌────────────────────┐
-                 │   Application      │
-                 │ Initialization     │
-                 └─────────┬──────────┘
-                           │
-        ┌──────────────────┼──────────────────┐
-        ▼                  ▼                  ▼
-
- Config Manager      Network Manager     UI Manager
-
-        │                  │                  │
-        │                  ▼                  │
-        │             NTP Client              │
-        │                  │                  │
-        │                  ▼                  │
-        └────────────► RTC Manager ◄──────────┘
-                           │
-                           ▼
-                    Launcher Manager
-                           │
-                           ▼
-                     Exit / Next ELF
+```text
+main.c
+  └─ Application
+       └─ System
+            ├─ Config Manager
+            ├─ Network Manager
+            ├─ NTP Client
+            ├─ RTC Manager
+            ├─ Time Manager
+            ├─ UI Manager
+            └─ Launcher Manager
 ```
 
 ---
 
-# Module Responsibilities
+## Module Responsibilities
 
-## Application
+### Application
 
 Responsible for:
+- startup and shutdown
+- initializing the system layer
+- coordinating the main flow
 
-- Program startup
-- Initialization sequence
-- Main execution loop
-- Graceful shutdown
+Location:
+- [src/core](src/core)
 
-Location
-
-```
-src/core/
-```
-
----
-
-## Config Manager
+### Config Manager
 
 Responsible for:
+- configuration loading and validation
+- future persistence and defaults
 
-- Reading INI configuration
-- Saving configuration
-- Default values
-- Validation
+Location:
+- [src/config](src/config)
 
-Future Features
-
-- Auto Sync
-- Selected NTP Server
-- Launch Path
-- Timezone
-- Theme
-
-Location
-
-```
-src/config/
-```
-
----
-
-## Network Manager
+### Network Manager
 
 Responsible for:
+- PS2 network initialization and status handling
+- future connection setup and diagnostics
 
-- Loading PS2 network modules
-- Bringing network online
-- DHCP
-- Connection status
-- Error reporting
+Location:
+- [src/network](src/network)
 
-Location
-
-```
-src/network/
-```
-
----
-
-## NTP Client
+### NTP Client
 
 Responsible for:
+- NTP request handling
+- response parsing and future time retrieval logic
 
-- Sending NTP request
-- Receiving response
-- Calculating UTC time
-- Server failover
-- Timeout handling
+Location:
+- [src/ntp](src/ntp)
 
-Future
-
-- Multiple servers
-- Automatic best server selection
-- Server latency measurements
-
-Location
-
-```
-src/ntp/
-```
-
----
-
-## RTC Manager
+### RTC Manager
 
 Responsible for:
+- reading and writing RTC values
+- future hardware integration and validation
 
-- Reading PS2 RTC
-- Writing RTC
-- Date validation
-- Leap year handling
+Location:
+- [src/rtc](src/rtc)
 
-Location
-
-```
-src/rtc/
-```
-
----
-
-## UI Manager
+### Time Manager
 
 Responsible for:
+- Unix timestamp to calendar conversions
+- RTC conversion logic for the PS2 hardware RTC
+- BCD helpers and date validation
+- timezone and formatting helpers
 
-- Rendering interface
-- Progress messages
-- Menus
-- Error dialogs
-- Theme support
+Location:
+- [src/time](src/time)
 
-Future
-
-- Dark Theme
-- Classic Theme
-- Minimal Theme
-
-Location
-
-```
-src/ui/
-```
-
----
-
-## Launcher Manager
+### UI Manager
 
 Responsible for:
+- future menu and screen rendering flow
+- user feedback and prompts
 
-- Returning to uLaunchELF
-- Launching OPL
-- Launching FMCB apps
-- Exit handling
+Location:
+- [src/ui](src/ui)
 
-Future
+### Launcher Manager
 
-- ELF Browser
-- Launch History
+Responsible for:
+- future launch and exit behavior
 
-Location
+Location:
+- [src/launcher](src/launcher)
 
-```
-src/launcher/
-```
+### Common
 
----
+Shared infrastructure used by the rest of the project:
+- logging
+- shared types and constants
+- module identifiers
 
-## Common
-
-Shared utilities.
-
-Examples
-
-- Logging
-- String helpers
-- File helpers
-- Error handling
-
-Location
-
-```
-src/common/
-```
+Location:
+- [src/common](src/common)
 
 ---
 
-# Initialization Flow
+## Current Initialization Flow
 
+```text
+Application Initialize
+  ↓
+System Initialize
+  ↓
+Module Startup
+  ↓
+Application Run / Future Workflow
 ```
-Application
 
-↓
-
-Load Configuration
-
-↓
-
-Initialize UI
-
-↓
-
-Initialize Network
-
-↓
-
-Request Time
-
-↓
-
-Validate Response
-
-↓
-
-Display Result
-
-↓
-
-User Confirmation (optional)
-
-↓
-
-Write RTC
-
-↓
-
-Launch Next ELF / Exit
-```
+The current application entry point initializes the system layer and then enters the placeholder runtime flow. The full NTP-to-RTC synchronization sequence remains a planned Phase 2+ feature.
 
 ---
 
-# Directory Structure
+## Directory Structure
 
-```
-EpochSync
-
+```text
+EpochSync/
 ├── docs/
-├── assets/
 ├── src/
-│
-├── core/
-├── network/
-├── ntp/
-├── rtc/
-├── config/
-├── ui/
-├── launcher/
-├── common/
-│
+│   ├── common/
+│   ├── config/
+│   ├── core/
+│   ├── launcher/
+│   ├── network/
+│   ├── ntp/
+│   ├── rtc/
+│   ├── system/
+│   ├── time/
+│   └── ui/
 ├── Makefile
-├── README.md
-└── LICENSE
+└── README.md
 ```
 
 ---
 
-# Design Principles
+## Design Principles
 
-- Single Responsibility Principle
-- Modular Architecture
-- Hardware Abstraction
-- Configuration Driven
-- Minimal Dynamic Memory
-- Defensive Programming
-- Backwards Compatible
-- Easy to Maintain
+- modular architecture
+- single responsibility per module
+- hardware abstraction where possible
+- defensive programming
+- clear separation between time math and hardware integration
 
 ---
 
-# Target Platform
+## Target Platform
 
-Console
-
-PlayStation 2 Slim SCPH-90004
+- PlayStation 2 homebrew
+- PS2SDK toolchain
 
 Region
 

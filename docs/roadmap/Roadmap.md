@@ -1,6 +1,6 @@
 # EpochSync Development Roadmap
 
-This roadmap tracks the planned development of EpochSync from the initial rewrite to the first stable public release.
+This roadmap tracks the current development direction for EpochSync as an early-stage PS2 homebrew project.
 
 ---
 
@@ -8,14 +8,14 @@ This roadmap tracks the planned development of EpochSync from the initial rewrit
 
 Version
 
-```
+```text
 Pre-Alpha
 ```
 
 Project State
 
-```
-Architecture Phase
+```text
+Architecture scaffold and module foundation
 ```
 
 ---
@@ -30,18 +30,16 @@ Status
 
 Tasks
 
-- Repository created
-- Directory layout
-- Documentation
-- Build Environment
-- VS Code Configuration
-- PS2DEV Setup
+- repository layout established
+- source module skeletons created
+- documentation added
+- PS2SDK build configuration wired up
 
 ---
 
 # Phase 1
 
-## Core Rewrite
+## Core Module Foundation
 
 Status
 
@@ -49,23 +47,20 @@ Status
 
 Tasks
 
-- Application Framework
-- Logger
-- Config Manager
-- RTC Manager
-- Network Manager
-- NTP Client
-- Launcher Manager
+- application startup and shutdown flow
+- shared logging and constants
+- config/network/NTP/RTC/launcher/UI module placeholders
+- TimeManager implementation for conversion and formatting
 
 Goal
 
-Feature parity with NTPS2.
+Establish a maintainable, modular codebase for future RTC synchronization work.
 
 ---
 
 # Phase 2
 
-## Modern UI
+## Runtime Workflow
 
 Status
 
@@ -73,19 +68,16 @@ Status
 
 Features
 
-- New Interface
-- Better Typography
-- Progress Screens
-- Status Messages
-- Error Dialogs
-- Controller Navigation
-- Theme Engine
+- end-to-end NTP retrieval flow
+- RTC update workflow
+- user confirmation and error handling
+- launcher integration
 
 ---
 
 # Phase 3
 
-## Configuration System
+## Configuration and UX
 
 Status
 
@@ -93,27 +85,15 @@ Status
 
 Features
 
-INI Support
-
-Example
-
-```
-AutoSync=true
-AutoLaunch=true
-LaunchPath=mc0:/BOOT/OPNPS2LD.ELF
-
-ConfirmRTC=false
-
-PreferredServer=pool.ntp.org
-
-Theme=Dark
-```
+- persistent INI-based configuration
+- user-facing menus and messages
+- richer status and error feedback
 
 ---
 
 # Phase 4
 
-## Network Improvements
+## Advanced Time Handling
 
 Status
 
@@ -121,24 +101,15 @@ Status
 
 Features
 
-- Server List
-- Automatic Failover
-- DNS Validation
-- Timeout Retry
-- Better Errors
-
-Servers
-
-- pool.ntp.org
-- time.google.com
-- time.cloudflare.com
-- time.windows.com
+- timezone-aware display handling
+- DST support
+- broader RTC validation and diagnostics
 
 ---
 
 # Phase 5
 
-## Launcher Improvements
+## Polish and Release
 
 Status
 
@@ -146,107 +117,10 @@ Status
 
 Features
 
-- Auto Launch
-- ELF Browser
-- Recent Applications
-- Return to Previous App
+- testing on real PS2 hardware
+- packaging and release workflow
+- final documentation and user guide
 
----
-
-# Phase 6
-
-## Advanced Features
-
-Status
-
-⬜ Planned
-
-Features
-
-- Automatic Timezone
-- DST Support
-- Region Detection
-- Network Diagnostics
-- Clock Drift Detection
-
----
-
-# Phase 7
-
-## Polish
-
-Status
-
-⬜ Planned
-
-Features
-
-- Localization
-- Icon Pack
-- Sound Effects
-- Animation
-- Settings Menu
-
----
-
-# Phase 8
-
-## Testing
-
-Status
-
-⬜ Planned
-
-Testing Platforms
-
-- SCPH-90004 PAL
-- OPL
-- FMCB
-- uLaunchELF
-- PCSX2
-
----
-
-# Phase 9
-
-## Release Candidate
-
-Status
-
-⬜ Planned
-
-Requirements
-
-- Stable
-- No Memory Leaks
-- Documentation Complete
-- User Guide
-- Changelog
-- GitHub Releases
-
----
-
-# Version History
-
-## v0.1
-
-Goal
-
-Feature parity with NTPS2
-
----
-
-## v0.2
-
-Configuration system
-
----
-
-## v0.3
-
-Modern UI
-
----
 
 ## v0.4
 

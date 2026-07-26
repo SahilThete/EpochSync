@@ -1,21 +1,18 @@
 # EpochSync Functional Specification
 
-Version: 0.1 Draft
+Version: 0.2 Draft
 
 Project Status:
-Pre-Alpha
+Early scaffold / pre-alpha
 
 Target Platform:
-Sony PlayStation 2
-
-Supported Hardware:
-PlayStation 2 Slim SCPH-90004 (PAL)
+Sony PlayStation 2 homebrew
 
 Framework:
 PS2SDK
 
 Compiler:
-GCC 15.2.0
+PS2 cross-compiler toolchain (GCC-based)
 
 ---
 
@@ -23,28 +20,29 @@ GCC 15.2.0
 
 ## 1.1 Purpose
 
-EpochSync is a standalone PlayStation 2 utility designed to synchronize the console's Real-Time Clock (RTC) using the Network Time Protocol (NTP).
+EpochSync is a modular PlayStation 2 utility project intended to synchronize the console RTC using network time. The current repository focuses on establishing the module architecture and shared helper layers for future RTC synchronization work.
 
-The project is a complete architectural rewrite inspired by NTPS2 with emphasis on:
+The project emphasizes:
 
 - modular design
-- improved reliability
-- improved user experience
 - maintainability
+- separation between time math and hardware integration
 - future extensibility
 
 ---
 
 ## 1.2 Objectives
 
-EpochSync shall:
+EpochSync shall eventually:
 
-- synchronize the PS2 RTC with an NTP server
-- validate received time before writing
+- synchronize the PS2 RTC with network time
+- validate received or computed time before writing
 - provide user feedback during synchronization
 - optionally request user confirmation
 - optionally launch another ELF after synchronization
-- maintain compatibility with existing PS2 homebrew environments
+- remain compatible with PS2SDK-based homebrew environments
+
+At the current stage, the codebase implements the foundation and time-management layer, while the full synchronization workflow remains planned.
 
 ---
 
@@ -52,14 +50,14 @@ EpochSync shall:
 
 Current Target
 
-- PlayStation 2 Slim SCPH-90004
-- PAL Region
+- PlayStation 2 homebrew environment
+- PS2SDK-based builds
 
-Planned Support
+Planned / Future
 
-- All PS2 Slim models
-- FAT models
+- PlayStation 2 hardware
 - PCSX2
+- additional homebrew toolchain setups
 
 ---
 
@@ -71,282 +69,111 @@ Application Startup
 
 Description
 
-Application shall initialize all required PS2 subsystems.
+The application shall initialize the required system and module layers.
 
-Success Criteria
+Current Status
 
-Application reaches main menu without crash.
+Implemented at the scaffold level.
 
 ---
 
 ## FR-002
 
-Configuration Loading
+Configuration Management
 
 Description
 
-Application shall load configuration from an INI file.
+Configuration handling shall load and validate settings when implemented.
 
-If configuration is missing:
+Current Status
 
-- defaults shall be used
-- application shall continue
+Module skeleton exists; full runtime behavior is pending.
 
 ---
 
 ## FR-003
 
-Network Initialization
+Time Management
 
 Description
 
-Application shall initialize the PS2 network stack.
+The application shall support calendar conversion, leap-year validation, RTC conversion, timezone handling, and time formatting.
 
-Success Criteria
+Current Status
 
-Network ready.
-
-Failure
-
-Display appropriate error.
+Implemented in the TimeManager module.
 
 ---
 
 ## FR-004
 
-NTP Synchronization
+RTC Integration
 
 Description
 
-Application shall send an NTP request.
+The project shall provide RTC read/write support using PS2 hardware integration.
 
-Receive response.
+Current Status
 
-Calculate UTC.
-
-Validate response.
+Module scaffold exists; actual hardware calls are still pending.
 
 ---
 
 ## FR-005
 
-RTC Update
+NTP Integration
 
 Description
 
-Application shall convert NTP timestamp into PS2 RTC format.
+The project shall eventually retrieve and validate network time.
 
-User confirmation may be requested.
+Current Status
 
-RTC shall then be updated.
+Client and network module skeletons exist; full implementation is pending.
 
 ---
 
 ## FR-006
 
-User Confirmation
+Launcher Integration
 
 Description
 
-Configuration determines behaviour.
+The project shall support launching another ELF or exiting after synchronization.
 
-Manual Mode
+Current Status
 
-Ask user before writing RTC.
-
-Automatic Mode
-
-Write immediately.
-
----
-
-## FR-007
-
-Launcher
-
-Description
-
-Depending on configuration:
-
-- Exit
-- Return to uLaunchELF
-- Launch configured ELF
-
----
-
-## FR-008
-
-Configuration Saving
-
-Description
-
-Changes made by user shall persist.
-
----
-
-## FR-009
-
-Server Selection
-
-Description
-
-User may select:
-
-- Automatic
-- Manual
-
-Manual selection shall display available servers.
-
----
-
-## FR-010
-
-Server Failover
-
-Description
-
-If server fails:
-
-Attempt next server.
-
-Maximum retries configurable.
-
----
-
-## FR-011
-
-Error Reporting
-
-Application shall display meaningful errors.
-
-No silent failures.
+Launcher module scaffold exists; behavior is not yet implemented.
 
 ---
 
 # 4. Non-Functional Requirements
 
-## Performance
-
-Application startup
-
-< 2 seconds
-
-NTP timeout
-
-Default
-
-5 seconds
-
-Maximum
-
-15 seconds
-
----
-
-## Memory
-
-Dynamic allocation shall be minimized.
-
-Memory leaks are unacceptable.
-
----
-
-## Stability
-
-Unexpected crashes are unacceptable.
-
-Configuration corruption shall not occur.
-
----
-
 ## Maintainability
 
-Modules shall remain independent.
-
-Single Responsibility Principle shall be followed.
-
----
+Modules shall remain independent and follow a clear responsibility boundary.
 
 ## Portability
 
-Code should compile on future PS2SDK releases with minimal changes.
+Code should remain compatible with the PS2SDK build environment and be straightforward to extend.
+
+## Reliability
+
+The implementation should validate input and avoid invalid date or RTC conversions.
 
 ---
 
-# 5. Configuration
+# 5. Current Implementation Notes
 
-Configuration file
+The current codebase includes:
 
-```
-EpochSync.ini
-```
+- application startup scaffold
+- system initialization layer
+- shared logging and constants
+- configuration, network, NTP, RTC, launcher, and UI module stubs
+- a working TimeManager implementation for conversion and formatting helpers
 
-Example
-
-```
-AutoSync=true
-
-ConfirmRTC=false
-
-PreferredServer=pool.ntp.org
-
-ServerMode=Automatic
-
-AutoLaunch=true
-
-LaunchPath=mc0:/BOOT/OPNPS2LD.ELF
-
-Theme=Dark
-
-Timeout=5000
-
-RetryCount=3
-```
-
----
-
-# 6. User Workflow
-
-Manual Mode
-
-```
-Launch
-
-↓
-
-Load Config
-
-↓
-
-Initialize Network
-
-↓
-
-Request Time
-
-↓
-
-Display Retrieved Time
-
-↓
-
-Confirm
-
-↓
-
-Write RTC
-
-↓
-
-Launch Next ELF / Exit
-```
-
-Automatic Mode
-
-```
-Launch
-
-↓
+The full user-facing synchronization workflow is still planned for future development.
 
 Load Config
 
