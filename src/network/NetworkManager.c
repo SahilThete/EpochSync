@@ -12,16 +12,25 @@
 
 #include "../common/Logger.h"
 #include "../common/Modules.h"
+#include "../config/ConfigManager.h"
 
+static bool g_Initialized = false;
 static bool g_IsConnected = false;
+static NetworkState g_State = NETWORK_STATE_DISCONNECTED;
 
 EpochSyncResult NetworkManager_Initialize(void)
 {
     Logger_Info(
         MODULE_NETWORK,
         "Initializing network manager.");
-
+    
+    g_Initialized = true;
     g_IsConnected = false;
+    g_State = NETWORK_STATE_DISCONNECTED;
+
+    Logger_Debug(
+        MODULE_NETWORK,
+        "Network manager initialized.");
 
     return EPOCHSYNC_SUCCESS;
 }
@@ -33,18 +42,36 @@ void NetworkManager_Shutdown(void)
         "Shutting down network manager.");
 
     g_IsConnected = false;
+    g_Initialized = false;
+    g_State = NETWORK_STATE_DISCONNECTED;
 }
 
 EpochSyncResult NetworkManager_Connect(void)
 {
-    Logger_Info(
+    Logger_Debug(
         MODULE_NETWORK,
-        "Connecting.");
+        "Attempting network connection.");
 
     /*
-     * Phase 1:
-     * Network stack not implemented.
-     */
+    * TODO (Phase 2):
+    *
+    * 1. Reset IOP
+    * 2. Load DEV9.IRX
+    * 3. Load SMAP.IRX
+    * 4. Load NETMAN.IRX
+    * 5. Initialize ps2ip
+    * 6. Acquire DHCP address
+    * 7. Update connection state
+    */
+
+    if (!g_Initialized)
+    {
+        Logger_Error(
+            MODULE_NETWORK,
+            "Network manager not initialized.");
+
+        return EPOCHSYNC_ERROR_UNKNOWN;
+    }
 
     if (g_IsConnected)
     {
@@ -56,17 +83,32 @@ EpochSyncResult NetworkManager_Connect(void)
     }
 
     g_IsConnected = true;
+    g_State = NETWORK_STATE_CONNECTED;
+
+    Logger_Debug(
+        MODULE_NETWORK,
+        "Connection state updated.");
 
     Logger_Info(
         MODULE_NETWORK,
-        "Network connected (simulated).");
+        "Network connected.");
 
     return EPOCHSYNC_SUCCESS;
 }
 
 EpochSyncResult NetworkManager_Disconnect(void)
 {
+    if (!g_Initialized)
+    {
+        Logger_Error(
+            MODULE_NETWORK,
+            "Network manager not initialized.");
+
+        return EPOCHSYNC_ERROR_UNKNOWN;
+    }
+
     g_IsConnected = false;
+    g_State = NETWORK_STATE_DISCONNECTED;
 
     Logger_Info(
         MODULE_NETWORK,
@@ -78,4 +120,14 @@ EpochSyncResult NetworkManager_Disconnect(void)
 bool NetworkManager_IsConnected(void)
 {
     return g_IsConnected;
+}
+
+bool NetworkManager_IsInitialized(void)
+{
+    return g_Initialized;
+}
+
+NetworkState NetworkManager_GetState(void)
+{
+    return g_State;
 }
