@@ -3,18 +3,16 @@
  * Launcher Manager
  *
  * Responsible for:
- *  - Managing next ELF
- *  - Executing next application
+ *  - Validating target ELF
+ *  - Executing the next application
  */
 
 #include "Launcher.h"
 
-#include <string.h>
-
 #include "../common/Logger.h"
 #include "../common/Modules.h"
 
-static LauncherConfiguration g_Launcher;
+static bool g_Initialized = false;
 
 EpochSyncResult Launcher_Initialize(void)
 {
@@ -22,7 +20,11 @@ EpochSyncResult Launcher_Initialize(void)
         MODULE_LAUNCHER,
         "Initializing launcher.");
 
-    memset(&g_Launcher, 0, sizeof(g_Launcher));
+    g_Initialized = true;
+
+    Logger_Debug(
+        MODULE_LAUNCHER,
+        "Launcher initialized.");
 
     return EPOCHSYNC_SUCCESS;
 }
@@ -32,53 +34,62 @@ void Launcher_Shutdown(void)
     Logger_Info(
         MODULE_LAUNCHER,
         "Shutting down launcher.");
+
+    g_Initialized = false;
 }
 
-EpochSyncResult Launcher_SetTarget(const char* path)
+EpochSyncResult Launcher_Execute(const char* path)
 {
+    if (!g_Initialized)
+    {
+        Logger_Error(
+            MODULE_LAUNCHER,
+            "Launcher not initialized.");
+
+        return EPOCHSYNC_ERROR_UNKNOWN;
+    }
+
     if (path == NULL)
     {
         Logger_Error(
             MODULE_LAUNCHER,
-            "Launcher_SetTarget called with NULL path.");
+            "Launcher_Execute called with NULL path.");
 
         return EPOCHSYNC_ERROR_INVALID_ARGUMENT;
     }
 
-    strncpy(
-        g_Launcher.NextELF,
-        path,
-        EPOCHSYNC_MAX_PATH_LENGTH - 1);
+    if (path[0] == '\0')
+    {
+        Logger_Error(
+            MODULE_LAUNCHER,
+            "Launcher_Execute called with empty path.");
 
-    g_Launcher.NextELF[EPOCHSYNC_MAX_PATH_LENGTH - 1] = '\0';
+        return EPOCHSYNC_ERROR_INVALID_ARGUMENT;
+    }
 
     Logger_Info(
         MODULE_LAUNCHER,
-        "Launcher target set.");
+        "Executing target ELF.");
 
-    return EPOCHSYNC_SUCCESS;
-}
-
-EpochSyncResult Launcher_Execute(void)
-{
-    Logger_Info(
-        MODULE_LAUNCHER,
-        "Executing target ELF (simulated).");
     /*
-     * Phase 2
+     * TODO (Phase 2):
      *
-     * LoadExecPS2()
+     * 1. Validate ELF path
+     * 2. Verify target file exists
+     * 3. Flush CPU caches
+     * 4. Shutdown RPC services
+     * 5. Shutdown IOP modules (if required)
+     * 6. Prepare LoadExecPS2() arguments
+     * 7. Execute target ELF
+     *
+     * NOTE:
+     * LoadExecPS2() does not return on success.
      */
 
     return EPOCHSYNC_SUCCESS;
 }
 
-bool Launcher_HasTarget(void)
+bool Launcher_IsInitialized(void)
 {
-    return (g_Launcher.NextELF[0] != '\0');
-}
-
-const char* Launcher_GetTarget(void)
-{
-    return g_Launcher.NextELF;
+    return g_Initialized;
 }
