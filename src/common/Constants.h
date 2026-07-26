@@ -27,6 +27,24 @@
 #define EPOCHSYNC_DEFAULT_RETRY_COUNT         3
 
 /*----------------------------------------------------------
+    Time
+----------------------------------------------------------*/
+
+#define EPOCHSYNC_SECONDS_PER_MINUTE             60
+#define EPOCHSYNC_MINUTES_PER_HOUR               60
+#define EPOCHSYNC_HOURS_PER_DAY                  24
+
+#define EPOCHSYNC_SECONDS_PER_HOUR \
+    (EPOCHSYNC_SECONDS_PER_MINUTE * EPOCHSYNC_MINUTES_PER_HOUR)
+#define EPOCHSYNC_SECONDS_PER_DAY \
+    (EPOCHSYNC_SECONDS_PER_HOUR * EPOCHSYNC_HOURS_PER_DAY)
+    
+/* PS2 RTC stores Japan Standard Time (UTC +9) */
+#define EPOCHSYNC_RTC_HARDWARE_UTC_OFFSET_SECONDS (9 * EPOCHSYNC_SECONDS_PER_HOUR)
+/* Maximum formatted string returned by TimeManager_Format() */
+#define EPOCHSYNC_MAX_FORMATTED_TIME_LENGTH      64
+
+/*----------------------------------------------------------
     UI
 ----------------------------------------------------------*/
 
