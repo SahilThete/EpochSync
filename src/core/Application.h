@@ -3,6 +3,10 @@
 
 #include "../common/Types.h"
 
+/*----------------------------------------------------------
+    Lifecycle
+----------------------------------------------------------*/
+
 EpochSyncResult Application_Initialize(void);
 
 void Application_Run(void);

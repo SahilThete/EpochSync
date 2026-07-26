@@ -16,14 +16,22 @@ EpochSyncResult Application_Initialize(void)
         MODULE_APPLICATION,
         "Initializing application.");
 
-    EpochSyncResult Result;
+    EpochSyncResult result;
 
-    Result = System_Initialize();
+    result = System_Initialize();
 
-    if (Result != EPOCHSYNC_SUCCESS)
+    if (result != EPOCHSYNC_SUCCESS)
     {
-        return Result;
+        Logger_Error(
+            MODULE_APPLICATION,
+            "System initialization failed.");
+        
+        return result;
     }
+
+    Logger_Info(
+        MODULE_APPLICATION,
+        "Application initialized.");
 
     return EPOCHSYNC_SUCCESS;
 }
@@ -31,12 +39,17 @@ EpochSyncResult Application_Initialize(void)
 void Application_Run(void)
 {
     /*
-     * Phase 1:
-     * Nothing to execute yet.
-     *
-     * Future:
-     * Main application state machine.
-     */
+    * TODO (Phase 2):
+    *
+    * Main application workflow:
+    *
+    * 1. Load configuration
+    * 2. Initialize network
+    * 3. Request NTP time
+    * 4. Update RTC
+    * 5. Launch configured ELF (optional)
+    * 6. Shutdown
+    */
 }
 
 void Application_Shutdown(void)
