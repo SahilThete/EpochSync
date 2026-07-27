@@ -96,7 +96,10 @@ Location:
 ### Launcher Manager
 
 Responsible for:
-- future launch and exit behavior
+- launching the configured ELF target
+- handling the runtime exit path after a successful launch attempt
+
+The launcher currently exposes a direct `Launcher_Execute(const char* path)` entry point rather than the older target-setter API. The application flow now uses this direct path when `AutoLaunchNextELF` is enabled and a `NextELF` target is present.
 
 Location:
 - [src/launcher](src/launcher)
@@ -122,10 +125,16 @@ System Initialize
   ↓
 Module Startup
   ↓
-Application Run / Future Workflow
+Application Run
+  ├─ Load Config
+  ├─ Connect Network
+  ├─ Request NTP
+  ├─ Commit RTC
+  ├─ Save Config
+  └─ Launch ELF if configured
 ```
 
-The current application entry point initializes the system layer and then enters the placeholder runtime flow. The full NTP-to-RTC synchronization sequence remains a planned Phase 2+ feature.
+The current application entry point initializes the system layer and then enters a simple state-driven runtime flow. The NTP-to-RTC synchronization sequence remains a Phase 2+ feature, but the application coordinator now advances through a defined sequence of states instead of relying on a single straight-line block.
 
 ---
 
