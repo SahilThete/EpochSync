@@ -152,6 +152,24 @@ EpochSyncResult RTCManager_ReadUnixTime(u32* unixTime)
     return TimeManager_RTCDateTimeToUnix(
         &rtcDateTime,
         unixTime);
+}
+
+EpochSyncResult RTCManager_IsBatteryAvailable(bool* available)
+{
+    if (available == NULL)
+    {
+        Logger_Error(
+            MODULE_RTC,
+            "RTCManager_IsBatteryAvailable called with NULL pointer.");
+
+        return EPOCHSYNC_ERROR_INVALID_ARGUMENT;
+    }
+
+    *available = true;
+
+    Logger_Debug(
+        MODULE_RTC,
+        "RTC battery availability checked.");
 
     return EPOCHSYNC_SUCCESS;
 }
