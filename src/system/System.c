@@ -28,7 +28,6 @@ EpochSyncResult System_Initialize(void)
     Logger_Info(
         MODULE_SYSTEM,
         "Initializing system.");
-    /* ---------- Initialize SIF ---------- */
 
     /* ---------- Initialize SIF ---------- */
 
