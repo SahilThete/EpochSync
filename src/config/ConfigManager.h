@@ -22,6 +22,18 @@ typedef struct EpochSyncConfig
 
     char PreferredServer[EPOCHSYNC_MAX_SERVER_NAME_LENGTH];
 
+    char NetworkMode[16];
+
+    char StaticIPAddress[16];
+
+    char StaticNetmask[16];
+
+    char StaticGateway[16];
+
+    char StaticDNS[16];
+
+    int TimeZoneOffsetMinutes;
+
 } EpochSyncConfig;
 
 /*----------------------------------------------------------

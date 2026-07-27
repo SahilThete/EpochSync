@@ -33,7 +33,18 @@ EpochSyncResult ConfigManager_Initialize(void)
 
     g_Config.NextELF[0] = '\0';
 
-    strcpy(g_Config.PreferredServer, "pool.ntp.org");
+    strncpy(g_Config.PreferredServer, "pool.ntp.org", sizeof(g_Config.PreferredServer) - 1);
+    g_Config.PreferredServer[sizeof(g_Config.PreferredServer) - 1] = '\0';
+
+    strncpy(g_Config.NetworkMode, "DHCP", sizeof(g_Config.NetworkMode) - 1);
+    g_Config.NetworkMode[sizeof(g_Config.NetworkMode) - 1] = '\0';
+
+    g_Config.StaticIPAddress[0] = '\0';
+    g_Config.StaticNetmask[0] = '\0';
+    g_Config.StaticGateway[0] = '\0';
+    g_Config.StaticDNS[0] = '\0';
+
+    g_Config.TimeZoneOffsetMinutes = 0;
 
     g_Initialized = true;
     g_ConfigLoaded = false;
@@ -105,7 +116,7 @@ EpochSyncResult ConfigManager_Save(void)
         MODULE_CONFIG,
         "Saving configuration (not implemented).");
 
-    return EPOCHSYNC_SUCCESS;
+    return EPOCHSYNC_ERROR_NOT_IMPLEMENTED;
 }
 
 bool ConfigManager_IsLoaded(void)
