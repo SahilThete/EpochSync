@@ -1,6 +1,9 @@
 #ifndef EPOCHSYNC_NTP_CLIENT_H
 #define EPOCHSYNC_NTP_CLIENT_H
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #include "../common/Types.h"
 
 /* RFC 5905 */
