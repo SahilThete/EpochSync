@@ -10,6 +10,7 @@
  */
 
 #include "System.h"
+#include "../graphics/GraphicsManager.h"
 
 /* PS2SDK */
 
@@ -71,9 +72,18 @@ EpochSyncResult System_Initialize(void)
     sbv_patch_disable_prefix_check();
 
     /*
-     * Future:
-     * Load embedded IRX modules.
-     */
+    * Future:
+    * Load embedded IRX modules.
+    */
+
+    if (GraphicsManager_Initialize() != EPOCHSYNC_SUCCESS)
+    {
+        Logger_Error(
+            MODULE_SYSTEM,
+            "Graphics initialization failed.");
+
+        return EPOCHSYNC_ERROR_SYSTEM;
+    }
 
     Logger_Info(
         MODULE_SYSTEM,
