@@ -49,54 +49,68 @@ EpochSyncResult Application_Initialize(void)
     result = TimeManager_Initialize();
     if (result != EPOCHSYNC_SUCCESS)
     {
-        Logger_Error(MODULE_APPLICATION, "TimeManager initialization failed.");
+        Logger_Error(
+            MODULE_APPLICATION,
+            "TimeManager initialization failed.");
         return result;
     }
 
     result = RTCManager_Initialize();
     if (result != EPOCHSYNC_SUCCESS)
     {
-        Logger_Error(MODULE_APPLICATION, "RTCManager initialization failed.");
+        Logger_Error(
+            MODULE_APPLICATION,
+            "RTCManager initialization failed.");
         return result;
     }
 
     result = ConfigManager_Initialize();
     if (result != EPOCHSYNC_SUCCESS)
     {
-        Logger_Error(MODULE_APPLICATION, "ConfigManager initialization failed.");
+        Logger_Error(
+            MODULE_APPLICATION,
+            "ConfigManager initialization failed.");
         return result;
     }
 
     result = NetworkManager_Initialize();
     if (result != EPOCHSYNC_SUCCESS)
     {
-        Logger_Error(MODULE_APPLICATION, "NetworkManager initialization failed.");
+        Logger_Error(
+            MODULE_APPLICATION,
+            "NetworkManager initialization failed.");
         return result;
     }
 
     result = NTPClient_Initialize();
     if (result != EPOCHSYNC_SUCCESS)
     {
-        Logger_Error(MODULE_APPLICATION, "NTPClient initialization failed.");
+        Logger_Error(
+            MODULE_APPLICATION,
+            "NTPClient initialization failed.");
         return result;
     }
 
     result = UIManager_Initialize();
     if (result != EPOCHSYNC_SUCCESS)
     {
-        Logger_Error(MODULE_APPLICATION, "UIManager initialization failed.");
+        Logger_Error(
+            MODULE_APPLICATION,
+            "UIManager initialization failed.");
         return result;
     }
 
     result = Launcher_Initialize();
     if (result != EPOCHSYNC_SUCCESS)
     {
-        Logger_Error(MODULE_APPLICATION, "Launcher initialization failed.");
+        Logger_Error(
+            MODULE_APPLICATION,
+            "Launcher initialization failed.");
         return result;
     }
 
     Logger_Info(
-        MODULE_APPLICATION,
+        MODULE_APPLICATION, 
         "Application initialized.");
 
     return EPOCHSYNC_SUCCESS;
@@ -104,12 +118,16 @@ EpochSyncResult Application_Initialize(void)
 
 void Application_Run(void)
 {
-    Logger_Info(MODULE_APPLICATION, "Running application workflow.");
+    Logger_Info(
+        MODULE_APPLICATION,
+        "Starting application runtime.");
+
+    bool running = true;
 
     ApplicationState state = APPLICATION_STATE_BOOT;
     u32 unixTimeUtc = 0;
 
-    while (state != APPLICATION_STATE_EXIT && state != APPLICATION_STATE_ERROR_FATAL)
+    while (running)
     {
         switch (state)
         {
@@ -121,7 +139,9 @@ void Application_Run(void)
         case APPLICATION_STATE_LOAD_CONFIG:
             if (ConfigManager_Load() != EPOCHSYNC_SUCCESS)
             {
-                Logger_Warning(MODULE_APPLICATION, "Configuration load failed; using defaults.");
+                Logger_Warning(
+                    MODULE_APPLICATION,
+                    "Configuration load failed; using defaults.");
                 Application_EnterErrorState(&state, APPLICATION_STATE_ERROR_CONFIG);
             }
             else
@@ -133,7 +153,9 @@ void Application_Run(void)
         case APPLICATION_STATE_INIT_NETWORK:
             if (NetworkManager_Connect() != EPOCHSYNC_SUCCESS)
             {
-                Logger_Warning(MODULE_APPLICATION, "Network connection failed.");
+                Logger_Warning(
+                    MODULE_APPLICATION,
+                    "Network connection failed.");
                 Application_EnterErrorState(&state, APPLICATION_STATE_ERROR_NETWORK);
             }
             else
@@ -178,7 +200,9 @@ void Application_Run(void)
             if (config != NULL && config->ConfirmBeforeWrite)
             {
                 UIManager_SetScreen(UI_SCREEN_CONFIRM);
-                Logger_Info(MODULE_APPLICATION, "RTC write confirmation requested.");
+                Logger_Info(
+                    MODULE_APPLICATION,
+                    "RTC write confirmation requested.");
                 state = APPLICATION_STATE_SAVE_CONFIG;
             }
             else
@@ -193,7 +217,9 @@ void Application_Run(void)
             const EpochSyncConfig* config = ConfigManager_GetConfiguration();
             if (config != NULL && config->ConfirmBeforeWrite)
             {
-                Logger_Info(MODULE_APPLICATION, "Skipping RTC write until confirmation is handled.");
+                Logger_Info(
+                    MODULE_APPLICATION,
+                    "Skipping RTC write until confirmation is handled.");
             }
             else if (RTCManager_WriteUnixTime(unixTimeUtc) != EPOCHSYNC_SUCCESS)
             {
@@ -201,7 +227,9 @@ void Application_Run(void)
             }
             else
             {
-                Logger_Info(MODULE_APPLICATION, "RTC write completed.");
+                Logger_Info(
+                    MODULE_APPLICATION,
+                    "RTC write completed.");
             }
             state = APPLICATION_STATE_SAVE_CONFIG;
             break;
@@ -210,25 +238,41 @@ void Application_Run(void)
         case APPLICATION_STATE_SAVE_CONFIG:
             if (ConfigManager_Save() != EPOCHSYNC_SUCCESS)
             {
-                Logger_Warning(MODULE_APPLICATION, "Configuration save is not implemented yet.");
+                Logger_Warning(
+                    MODULE_APPLICATION,
+                    "Configuration save is not implemented yet.");
             }
             state = APPLICATION_STATE_UI;
             break;
 
         case APPLICATION_STATE_UI:
-            UIManager_SetScreen(UI_SCREEN_MAIN);
-            state = APPLICATION_STATE_LAUNCH;
+        {
+            /*
+            * Idle state.
+            *
+            * The application remains here until
+            * controller input changes the state.
+            */
             break;
+        }
 
         case APPLICATION_STATE_LAUNCH:
         {
             const EpochSyncConfig* config = ConfigManager_GetConfiguration();
             if (config != NULL && config->AutoLaunchNextELF && config->NextELF[0] != '\0')
             {
-                Logger_Info(MODULE_APPLICATION, "Launching configured ELF.");
+                Logger_Info(
+                    MODULE_APPLICATION,
+                    "Launching configured ELF.");
                 Launcher_Execute(config->NextELF);
             }
-            state = APPLICATION_STATE_EXIT;
+
+            UIManager_SetScreen(UI_SCREEN_MAIN);
+            /*
+            * Runtime continues.
+            * Exit will later be triggered by controller input.
+            */
+            state = APPLICATION_STATE_UI;
             break;
         }
 
@@ -236,15 +280,37 @@ void Application_Run(void)
         case APPLICATION_STATE_ERROR_NETWORK:
         case APPLICATION_STATE_ERROR_NTP:
         case APPLICATION_STATE_ERROR_RTC:
-            Logger_Error(MODULE_APPLICATION, "Application workflow entered an error state.");
+            Logger_Error(
+                MODULE_APPLICATION,
+                "Application workflow entered an error state.");
             UIManager_SetScreen(UI_SCREEN_ERROR);
-            state = APPLICATION_STATE_EXIT;
+            state = APPLICATION_STATE_ERROR_FATAL;
+            break;
+
+        case APPLICATION_STATE_EXIT:
+            running = false;
             break;
 
         default:
-            state = APPLICATION_STATE_EXIT;
+            Logger_Error(
+                MODULE_APPLICATION,
+                "Unknown application state.");
+            running = false;
             break;
-        }
+
+        if (state == APPLICATION_STATE_ERROR_FATAL)
+            {
+                running = false;
+            }
+
+        UIManager_Update();
+        UIManager_Render();
+        /*
+        * TODO:
+        * Synchronize to VBlank.
+        */
+       WaitVblankStart();
+
     }
 }
 
