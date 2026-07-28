@@ -45,6 +45,7 @@ SRC_DIRS := \
 	src/core \
 	src/common \
 	src/config \
+	src/graphics \
 	src/launcher \
 	src/network \
 	src/ntp \
@@ -75,6 +76,7 @@ EE_INCS := \
 	-Isrc/core \
 	-Isrc/common \
 	-Isrc/config \
+	-Isrc/graphics \
 	-Isrc/launcher \
 	-Isrc/network \
 	-Isrc/ntp \
