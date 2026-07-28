@@ -4,6 +4,7 @@
  */
 
 #include "Application.h"
+#include "kernel.h"
 
 #include "../system/System.h"
 #include "../config/ConfigManager.h"
@@ -297,11 +298,12 @@ void Application_Run(void)
                 "Unknown application state.");
             running = false;
             break;
+        }
 
         if (state == APPLICATION_STATE_ERROR_FATAL)
-            {
-                running = false;
-            }
+        {
+            running = false;
+        }
 
         UIManager_Update();
         UIManager_Render();
@@ -309,8 +311,6 @@ void Application_Run(void)
         * TODO:
         * Synchronize to VBlank.
         */
-       WaitVblankStart();
-
     }
 }
 

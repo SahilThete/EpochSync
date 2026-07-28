@@ -82,7 +82,7 @@ EpochSyncResult System_Initialize(void)
             MODULE_SYSTEM,
             "Graphics initialization failed.");
 
-        return EPOCHSYNC_ERROR_SYSTEM;
+        return EPOCHSYNC_ERROR_UNKNOWN;
     }
 
     Logger_Info(
@@ -97,6 +97,8 @@ void System_Shutdown(void)
     Logger_Info(
         MODULE_SYSTEM,
         "Shutting down system.");
+
+    GraphicsManager_Shutdown();
 
     /*
      * Reserved.
