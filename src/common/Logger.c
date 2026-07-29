@@ -4,7 +4,10 @@
  */
 
 #include "Logger.h"
+
 #include <stddef.h>
+#include <stdio.h>
+#include <debug.h>
 
 static LoggerConfiguration g_Logger =
 {
@@ -69,23 +72,34 @@ void Logger_Log(
         return;
     }
 
-    /*
-     * Phase 2
-     *
-     * Format:
-     *
-     * [INFO] [Network] Connected.
-     *
-     * Future outputs:
-     *
-     * Screen
-     * PCSX2 Console
-     * EpochSync.log
-     */
+    const char *levelName = "INFO";
 
-    (void)level;
-    (void)module;
-    (void)message;
+    switch (level)
+    {
+        case LOG_LEVEL_DEBUG:
+            levelName = "DEBUG";
+            break;
+
+        case LOG_LEVEL_INFO:
+            levelName = "INFO";
+            break;
+
+        case LOG_LEVEL_WARNING:
+            levelName = "WARN";
+            break;
+
+        case LOG_LEVEL_ERROR:
+            levelName = "ERROR";
+            break;
+
+        default:
+            break;
+    }
+
+    printf("[%s] [%s] %s\n",
+        levelName,
+        module,
+        message);
 }
 
 void Logger_Debug(

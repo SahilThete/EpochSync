@@ -4,10 +4,10 @@
  */
 
 #include "Application.h"
-#include "kernel.h"
 
 #include "../system/System.h"
 #include "../config/ConfigManager.h"
+#include "../graphics/GraphicsManager.h"
 #include "../launcher/Launcher.h"
 #include "../network/NetworkManager.h"
 #include "../ntp/NTPClient.h"

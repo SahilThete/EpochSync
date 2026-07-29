@@ -101,7 +101,8 @@ EE_LIBS := \
 	-lcdvd \
 	-lgskit \
 	-ldmakit \
-	-lpad
+	-lpad \
+	-ldebug
 
 #------------------------------------------------------------------------------
 # Compiler Flags
