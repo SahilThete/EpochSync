@@ -7,6 +7,7 @@
  #include <debug.h>
  #include "common/Logger.h"
  #include "common/Modules.h"
+ #include "common/Version.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,16 +17,18 @@ int main(int argc, char *argv[])
     init_scr();
     scr_clear();
 
+    Logger_Initialize();
+
     Logger_Info(
         MODULE_APPLICATION,
-        "Starting EpochSync.");
+        "Starting EpochSync %s.",
+        EPOCHSYNC_VERSION_STRING);
 
     if (Application_Initialize() != EPOCHSYNC_SUCCESS)
+    {
+        Logger_Shutdown();
         return -1;
-
-    Logger_Info(
-        MODULE_APPLICATION,
-        "Application initialized.");
+    }
 
     Application_Run();
 
@@ -34,6 +37,8 @@ int main(int argc, char *argv[])
     Logger_Info(
         MODULE_APPLICATION,
         "Application exiting.");
+
+    Logger_Shutdown();
 
     return 0;
 }
